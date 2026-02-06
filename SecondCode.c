@@ -1,6 +1,3 @@
-a. Khai báo Thư viện và Cấu hình định danh (Libraries & Credentials)
-Phần này nạp các thư viện cần thiết để giao tiếp với phần cứng và định nghĩa các thông số kết nối Server Blynk.
-Code:
 // --- Cấu hình thông tin kết nối Blynk ---
 #define BLYNK_AUTH_TOKEN  "4xusCWyFI2U--XbkJhlB8zxHYWL-dzYe" // Token bảo mật riêng của thiết bị
 #define BLYNK_TEMPLATE_ID "TMPL6y6h6S4yk"                 // ID giao diện mẫu trên Blynk
@@ -26,9 +23,7 @@ LiquidCrystal_I2C lcd(0x27, 16, 2);
 char auth[] = BLYNK_AUTH_TOKEN;
 char ssid[] = "TP-LINK_708E";   // Tên WiFi
 char pass[] = "";               // Mật khẩu WiFi (Đang để trống)
-b. Khai báo Biến toàn cục và Chân kết nối (Variables & Pin Definitions)
-Định nghĩa các chân phần cứng (GPIO) và các biến lưu trữ trạng thái hoạt động của hệ thống.
-Code:
+
 BlynkTimer timer;       // Khởi tạo bộ định thời của Blynk
 bool ledStripOn = false;
 
@@ -67,9 +62,7 @@ int lcdPage = 0;                        // Biến đếm trang màn hình LCD
 
 
 float mappedSoilMoisture = 0;           // Biến lưu độ ẩm đất đã quy đổi ra %
-c. Hàm khởi tạo (Setup Function)
-Chạy một lần duy nhất khi cấp nguồn, dùng để thiết lập môi trường hoạt động.
-Code:
+
 void setup() {
   Serial.begin(115200);   // Bật cổng Serial để debug lỗi
   
@@ -100,9 +93,6 @@ void setup() {
   Blynk.virtualWrite(V6, LOW); // Mặc định là chế độ Tự động
   Blynk.virtualWrite(V5, LOW); // Mặc định nút bơm là OFF
 }
-d. Các hàm giao tiếp với App Blynk (Blynk Callbacks)
-Xử lý dữ liệu nhận được TỪ điện thoại gửi VỀ mạch ESP32.
-Code:
 // Hàm này được gọi khi nút nhấn Bơm (V5) trên App thay đổi trạng thái
 BLYNK_WRITE(V5) { 
   if (pumpMode == 1) { // Chỉ thực thi nếu đang ở chế độ Thủ công (Manual)
@@ -116,8 +106,7 @@ BLYNK_WRITE(V5) {
 BLYNK_WRITE(V6) { 
   pumpMode = param.asInt(); // Cập nhật biến chế độ: 0 = Auto, 1 = Manual
 }
-e. Vòng lặp chính (Loop Function)
-Nơi điều phối toàn bộ hoạt động của hệ thống.
+
 void loop() {
   Blynk.run(); // Duy trì kết nối với Server Blynk
   timer.run(); // Chạy bộ định thời (nếu có dùng SimpleTimer)
@@ -171,8 +160,7 @@ void loop() {
   // --- Cập nhật hiển thị LCD (chạy độc lập với cảm biến) ---
   displayLCD(); 
 }
-f. Hàm Logic Điều khiển Tự động (Core Logic)
-Đây là bộ não của hệ thống, quyết định việc bật/tắt bơm.
+
 void autoControlPump(float mappedSoilMoisture) {
   // Ưu tiên 1: BẢO VỆ BƠM (Kiểm tra mực nước)
   if (waterLevel < 30) {
@@ -204,8 +192,7 @@ void autoControlPump(float mappedSoilMoisture) {
     Blynk.virtualWrite(V5, pumpState); 
   }
 }
-g. Hàm Giao tiếp Cảm biến & Hiển thị (Auxiliary Functions)
-Các hàm phụ trợ giúp code gọn gàng hơn.
+
 // Hàm điều khiển LED chỉ thị trạng thái độ ẩm trên App
 void controlLED(float mappedSoilMoisture) {
   if (mappedSoilMoisture <= SOIL_MOISTURE_LOW) {
