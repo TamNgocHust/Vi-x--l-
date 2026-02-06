@@ -28,36 +28,36 @@ bool ledStripOn = false;
 
 DHT dht(DHTPIN, DHTTYPE);
 
-const int soilMoisturePin = 35; // Analog pin for the soil moisture sensor
+const int soilMoisturePin = 35; 
 
-const int waterLevelPin = 34;   // Analog pin for the water level sensor
+const int waterLevelPin = 34;   
 
 const int ledPin = 2;
 
-// Constants for soil moisture thresholds
 
-const int SOIL_MOISTURE_LOW = 50;  // Adjusted to match the 0-100 range
 
-const int SOIL_MOISTURE_HIGH = 50; // Adjusted to match the 0-100 range
+const int SOIL_MOISTURE_LOW = 50;  
 
-const int pumpPin = 5;  // Change this to the actual pin connected to the DC pump on ESP32
+const int SOIL_MOISTURE_HIGH = 50; 
 
-int pumpState = LOW;    // Initialize pumpState to LOW (off)
+const int pumpPin = 5;  
 
-int pumpMode = 0;       // 0 for automatic, 1 for manual
+int pumpState = LOW;    
 
-int waterLevel = 0;     // Water level indicator value
+int pumpMode = 0;      
+
+int waterLevel = 0;    
 
 unsigned long previousMillis = 0;
 
-const unsigned long interval = 1000; // Interval in milliseconds
+const unsigned long interval = 1000; 
 unsigned long lcdPrevMillis = 0;
-const unsigned long lcdInterval = 2000; // 2 giây đổi 1 thông số
+const unsigned long lcdInterval = 2000; 
 int lcdPage = 0;
 
 
 
-float mappedSoilMoisture = 0; // Declare mappedSoilMoisture as a global variable
+float mappedSoilMoisture = 0; 
 
 
 
@@ -85,29 +85,29 @@ void setup() {
 
   Blynk.virtualWrite(V3, "LED OFF");
 
-  Blynk.virtualWrite(V6, LOW); // Initialize the mode button to automatic mode
+  Blynk.virtualWrite(V6, LOW); 
 
-  Blynk.virtualWrite(V5, LOW); // Initialize the pump button to OFF
+  Blynk.virtualWrite(V5, LOW); 
 
 }
 
 
-BLYNK_WRITE(V5) { // This function is called when the pump button state changes (Manual Control)
+BLYNK_WRITE(V5) { 
 
-  if (pumpMode == 1) { // Check if the mode is manual
+  if (pumpMode == 1) {
 
-    pumpState = param.asInt(); // Read the state of the pump button (0 for OFF, 1 for ON)
+    pumpState = param.asInt(); 
 
-    digitalWrite(pumpPin, pumpState); // Turn the pump on or off based on button state
+    digitalWrite(pumpPin, pumpState); 
 
   }
 
 }
 
 
-BLYNK_WRITE(V6) { // This function is called when the mode button state changes
+BLYNK_WRITE(V6) { 
 
-  pumpMode = param.asInt(); // Read the state of the mode button (0 for automatic, 1 for manual)
+  pumpMode = param.asInt(); 
 
 }
 
@@ -124,7 +124,7 @@ void loop() {
 
     previousMillis = currentMillis;
 
-    // Read soil moisture or water level based on the flag
+  
 
     if (pumpMode == 0) {
 
@@ -133,15 +133,14 @@ void loop() {
 
       Serial.println(soilSensorValue);
 
-      mappedSoilMoisture = map(soilSensorValue, 0, 4095, 100, 0); // Update mappedSoilMoisture
+      mappedSoilMoisture = map(soilSensorValue, 0, 4095, 100, 0); 
 
-      autoControlPump(mappedSoilMoisture); // Automatically control the pump based on soil moisture if in automatic mode
+      autoControlPump(mappedSoilMoisture); 
 
     }
 
     
 
-    // Read water level
 
     waterLevel = analogRead(waterLevelPin);
     Serial.printf("Mucnuoc:");
@@ -149,26 +148,22 @@ void loop() {
 
     if (waterLevel < 450) {
 
-      waterLevel = 0; // Set water level to 0 if below a threshold
+      waterLevel = 0; 
 
     } else {
 
-      waterLevel = map(waterLevel, 450, 3000, 0, 100); // Map water level to 0-100
+      waterLevel = map(waterLevel, 450, 3000, 0, 100); 
 
     }
-
-    
-
-    // Control LED
 
     controlLED(mappedSoilMoisture);
 
 
-    // Read and send sensor data
+
 
     readAndSendSensorData();
 
-    Blynk.virtualWrite(V7, waterLevel); // Send water level to Blynk
+    Blynk.virtualWrite(V7, waterLevel); 
 
   }
   displayLCD(); 
@@ -179,8 +174,6 @@ void autoControlPump(float mappedSoilMoisture) {
 
   if (waterLevel < 30) {
 
-    // Water level is too low, do not turn on the pump
-
     pumpState = LOW;
 
     digitalWrite(ledPin, LOW);
@@ -189,33 +182,24 @@ void autoControlPump(float mappedSoilMoisture) {
 
     Blynk.setProperty(V2, "color", "#D3435C");
 
-    
-
   } else if (mappedSoilMoisture <= SOIL_MOISTURE_LOW) {
-
-    // If soil moisture is below the threshold and water level is okay, turn the pump ON
 
     pumpState = HIGH;
 
   } else if (mappedSoilMoisture >= SOIL_MOISTURE_HIGH) {
-
-    // If soil moisture is above the threshold, turn the pump OFF
-
     pumpState = LOW;
-
   }
 
 
-  digitalWrite(pumpPin, pumpState); // Update the pump state
+  digitalWrite(pumpPin, pumpState);
 
   if (pumpMode == 0) {
 
-    Blynk.virtualWrite(V5, pumpState); // Update the pump button status on Blynk
+    Blynk.virtualWrite(V5, pumpState); 
 
   }
 
 }
-
 
 void controlLED(float mappedSoilMoisture) {
 
@@ -277,7 +261,7 @@ void readAndSendSensorData() {
 
   if (pumpMode == 0) {
 
-    Blynk.virtualWrite(V4, mappedSoilMoisture); // Update mappedSoilMoisture on Blynk
+    Blynk.virtualWrite(V4, mappedSoilMoisture);
 
   }
 
